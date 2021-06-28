@@ -4,10 +4,12 @@
 #include "DHT.h"
 
 // Libraries used by the server
-#include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include "AsyncJson.h"
 #include "ArduinoJson.h"
+
+// File containing WIFI credPentials
+#include "credentials.h"
 
 
 /*
@@ -25,13 +27,24 @@ DHT dht(DHTPIN, DHTTYPE);
 
 
 /*
+ * Relay setup
+ */
+
+// Define the relay pins
+#define RELAY_IN_1 5
+#define RELAY_IN_2 18
+
+bool relay_in_1 = false;
+bool relay_in_2 = false;
+
+/*
  * Server setup
  */
 
 AsyncWebServer server(80);
 
-const char *ssid = "CASELAB";
-const char *password = "CaseLocalNet";
+const char *ssid = WIFI_SSID;
+const char *password = WIFI_PASSWORD;
 
 void notFound(AsyncWebServerRequest *request)
 {
@@ -40,10 +53,13 @@ void notFound(AsyncWebServerRequest *request)
 
 void setup() {
   Serial.begin(115200);
-  
+
+  pinMode(RELAY_IN_1, OUTPUT);
+  pinMode(RELAY_IN_2, OUTPUT);
+
   // Call begin to start sensor
   dht.begin();
-  
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.waitForConnectResult() != WL_CONNECTED)
@@ -74,19 +90,61 @@ void setup() {
 
   server.on("/read", HTTP_GET, [](AsyncWebServerRequest *request) {
     StaticJsonDocument<100> data;
-    
+
     float t = dht.readTemperature();
     float h = dht.readHumidity();
-    
+
     data["temperature"] = t;
     data["humidity"] = h;
-    
+
     String response;
     serializeJson(data, response);
     request->send(200, "application/json", response);
   });
 
-  AsyncCallbackJsonWebHandler *handler = 
+  server.on("/in1", HTTP_GET, [](AsyncWebServerRequest *request) {
+    StaticJsonDocument<100> data;
+
+    relay_in_1 = !relay_in_1;
+
+    if (relay_in_1)
+    {
+      digitalWrite(RELAY_IN_1, HIGH);
+    }
+    else
+    {
+      digitalWrite(RELAY_IN_1, LOW);
+    }
+
+    data["relay_in_1"] = relay_in_1;
+
+    String response;
+    serializeJson(data, response);
+    request->send(200, "application/json", response);
+  });
+
+  server.on("/in2", HTTP_GET, [](AsyncWebServerRequest *request) {
+    StaticJsonDocument<100> data;
+
+    relay_in_2 = !relay_in_2;
+
+    if (relay_in_2)
+    {
+      digitalWrite(RELAY_IN_2, HIGH);
+    }
+    else
+    {
+      digitalWrite(RELAY_IN_2, LOW);
+    }
+
+    data["relay_in_2"] = relay_in_2;
+
+    String response;
+    serializeJson(data, response);
+    request->send(200, "application/json", response);
+  });
+
+  AsyncCallbackJsonWebHandler *handler =
     new AsyncCallbackJsonWebHandler("/post-message", [](AsyncWebServerRequest *request, JsonVariant &json) {
       StaticJsonDocument<200> data;
       if (json.is<JsonArray>())
@@ -102,7 +160,7 @@ void setup() {
       request->send(200, "application/json", response);
       Serial.println(response);
   });
-  
+
   server.addHandler(handler);
   server.onNotFound(notFound);
   server.begin();

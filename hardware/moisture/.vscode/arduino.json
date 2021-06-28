@@ -1,0 +1,5 @@
+{
+    "sketch": "moisture.ino",
+    "port": "COM4",
+    "output": "../build"
+}

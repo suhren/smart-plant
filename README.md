@@ -48,8 +48,38 @@ I also had a problem with not having access to the serial port `/dev/ttyUSB0` wh
 4. Press the upload sketch button and the LED on the board should now start blinking!
 5. We can also open `Tools -> Serial Monitor` and select the same baud rate in the bottom right as in the code. We should now see the prints to the serial as the LED is blinking!
 
+If you get the error `A fatal error occurred: Failed to connect to ESP32: Timed out waiting for packet header` you might have to press and hold the `BOOT` button on the ESP board while the sketch is uploading.
+
+If the light is not blinking, or nothing happens, you might have to press the `EN` button on the board to restart it. The light should then start blinking.
+
 # Using the DHT22 sensor
 http://www.esp32learning.com/code/esp32-and-am2302-sensor-example.php
 
+We can install libraries in two ways:
+
+1. In the Arduino IDE we can select `Sketch -> Include Library -> Manage Libraries` and search for the library name and install it this way.
+2. We can also download the library as a zip file from the https://github.com/ and then select `Sketch -> Include Library -> Install .ZIP Library...`
+
+First add the DHT library from Adafruit:
+
+DHT Sensor
+https://github.com/adafruit/DHT-sensor-library
+
+
 # Creating a web server
+
+Async TCP
+https://github.com/me-no-dev/AsyncTCP
+
+ESP Async Web Server:
+https://github.com/me-no-dev/ESPAsyncWebServer
+
+Arduino JSON
+https://github.com/bblanchon/ArduinoJson
+
+Adafruit Sensor
+https://github.com/adafruit/Adafruit_Sensor
+
+
+
 https://medium.com/@raphaelpralat/example-of-json-rest-api-for-esp32-4a5f64774a05

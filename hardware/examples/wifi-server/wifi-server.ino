@@ -20,15 +20,18 @@
  created for arduino 25 Nov 2012
  by Tom Igoe
 
-ported for sparkfun esp32 
+ported for sparkfun esp32
 31.01.2017 by Jan Hendrik Berlin
- 
+
  */
 
 #include <WiFi.h>
 
-const char* ssid     = "CASELAB";
-const char* password = "CaseLocalNet";
+// File containing WIFI credentials
+#include "credentials.h"
+
+const char *ssid = WIFI_SSID;
+const char *password = WIFI_PASSWORD;
 
 int LED_PIN = 2;
 
@@ -59,7 +62,7 @@ void setup()
     Serial.println("WiFi connected.");
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
-    
+
     server.begin();
 
 }
